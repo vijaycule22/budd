@@ -68,7 +68,7 @@ export const authOptions = {
     }),
   ],
   session: {
-    strategy: "jwt",
+    strategy: "jwt" as const,
   },
   callbacks: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
