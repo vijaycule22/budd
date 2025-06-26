@@ -1,27 +1,47 @@
-# 📚 Study Buddy AI
+# StudyBuddy AI - Intelligent Learning Assistant
 
-A full-stack web application that helps students understand study materials through AI-powered explanations in multiple Indian languages with high-quality voice synthesis. Upload your PDF study materials and get explanations in Telugu (using English letters), Hindi, Tamil, Kannada, or English.
+A comprehensive AI-powered study assistant that transforms PDF documents into personalized, easy-to-understand explanations with natural voice narration in multiple languages.
 
-## ✨ Features
+## Features
 
-- **📄 PDF Upload**: Drag-and-drop or click to upload study material PDFs
-- **🤖 AI Explanations**: Get friendly, casual explanations of study content
-- **🌍 Language Options**: Choose between Telugu (English letters), Hindi, Tamil, Kannada, or English
-- **💬 Chat-style Interface**: View explanations in a conversational format
-- **🔄 Explain Again**: Request simpler explanations for any section
-- **📱 Responsive Design**: Works on desktop and mobile devices
-- **🎤 Voice Synthesis**: Uses high-quality AI voices using Eleven v3 Alpha model
-- **🔊 Voice Controls**: Play, pause, resume, and stop functionality
-- **🔧 Voice Settings**: Customize speed, pitch, volume, and voice selection
+### 🎯 Core Features
 
-## 🚀 Quick Start
+- **Smart PDF Processing**: Upload any PDF and get intelligent content analysis
+- **Multi-language Support**: English, Telugu, Hindi, Tamil, and Kannada
+- **Voice Narration**: Natural AI voices with browser TTS and ElevenLabs integration
+- **Friendly Explanations**: Casual, easy-to-understand explanations
+- **Markdown Rendering**: Beautiful formatting for summaries
+
+### 👥 User Management
+
+- **Authentication System**: Secure login with NextAuth.js
+- **Role-based Access**: Admin and User roles with different permissions
+- **Admin Dashboard**: Comprehensive user management and analytics
+- **User Dashboard**: Personalized learning experience
+
+### 🛡️ Admin Features
+
+- **User Management**: View, activate, deactivate, and delete users
+- **Analytics Dashboard**: Usage statistics and system health monitoring
+- **System Settings**: Configurable application parameters
+- **Activity Monitoring**: Real-time user activity tracking
+
+## Tech Stack
+
+- **Frontend**: Next.js 14, React, TypeScript, Tailwind CSS
+- **Authentication**: NextAuth.js with credentials provider
+- **AI Services**: OpenAI GPT-4, ElevenLabs TTS
+- **PDF Processing**: pdf-parse
+- **Styling**: Tailwind CSS with custom components
+
+## Getting Started
 
 ### Prerequisites
 
 - Node.js 18+
 - npm or yarn
 - OpenAI API key
-- ElevenLabs API key (optional, for enhanced AI voices)
+- ElevenLabs API key (optional, for premium voice synthesis)
 
 ### Installation
 
@@ -42,86 +62,169 @@ A full-stack web application that helps students understand study materials thro
    Create a `.env.local` file in the root directory:
 
    ```env
-   OPENAI_API_KEY=your_openai_api_key_here
-   ELEVENLABS_API_KEY=your_elevenlabs_api_key_here
+   # NextAuth Configuration
+   NEXTAUTH_URL=http://localhost:3000
+   NEXTAUTH_SECRET=your-nextauth-secret-key-here
+
+   # Admin Credentials
+   ADMIN_EMAIL=admin@studybuddy.com
+   ADMIN_PASSWORD=admin123
+
+   # ElevenLabs API
+   ELEVENLABS_API_KEY=your-elevenlabs-api-key-here
+
+   # OpenAI API (for summarization)
+   OPENAI_API_KEY=your-openai-api-key-here
    ```
 
-   Get your OpenAI API key from: https://platform.openai.com/api-keys
+4. **Generate NextAuth secret**
 
-4. **Run the development server**
+   ```bash
+   openssl rand -base64 32
+   ```
+
+   Use the output as your `NEXTAUTH_SECRET`
+
+5. **Run the development server**
 
    ```bash
    npm run dev
    ```
 
-5. **Open your browser**
+6. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
-## 🛠️ Tech Stack
+## Usage
 
-- **Frontend**: Next.js 14, React, TypeScript, Tailwind CSS
-- **Backend**: Next.js API Routes
-- **PDF Processing**: pdf-parse
-- **AI Integration**: OpenAI GPT-3.5-turbo
-- **File Upload**: FormData API
-- **Voice**: Web Speech API, ElevenLabs API
+### Demo Credentials
 
-## 📖 Usage
+**Admin Account:**
 
-1. **Upload PDF**: Drag and drop your study material PDF or click to browse
-2. **Choose Language**: Select between Telugu (English letters), Hindi, Tamil, Kannada, or English
-3. **Choose Voice Type**:
-   - Browser TTS: Uses built-in browser voices
-   - ElevenLabs AI: Uses high-quality AI voices (requires API key)
-4. **Listen**: Click the "Listen" button to hear the explanation
-5. **Voice Settings**: Customize voice parameters for optimal experience
+- Email: `admin@studybuddy.com`
+- Password: `admin123`
 
-## 🎯 How It Works
+**User Account:**
 
-1. **PDF Processing**: The app extracts text from your uploaded PDF
-2. **Chunking**: Content is split into logical sections (paragraphs)
-3. **AI Explanation**: Each chunk is sent to OpenAI with a friendly prompt
-4. **Display**: Explanations are shown in a chat-style interface
+- Email: `user@studybuddy.com`
+- Password: `user123`
 
-## 🔧 API Endpoints
+### User Flow
+
+1. **Sign In**: Use the demo credentials or create your own
+2. **Upload PDF**: Drag and drop or select a PDF file
+3. **Choose Language**: Select your preferred language for explanations
+4. **Select Voice Engine**: Choose between browser TTS or ElevenLabs AI
+5. **Get Results**: View formatted explanations and listen to voice narration
+
+### Admin Features
+
+1. **Dashboard Overview**: View system statistics and recent activity
+2. **User Management**: Manage user accounts and permissions
+3. **Analytics**: Monitor usage patterns and system health
+4. **Settings**: Configure application parameters
+
+## API Endpoints
+
+### Authentication
+
+- `POST /api/auth/signin` - User sign in
+- `GET /api/auth/signout` - User sign out
+
+### Core Features
 
 - `POST /api/upload` - Upload and process PDF files
-- `POST /api/explain` - Get AI explanations for text chunks
+- `POST /api/summarize` - Generate AI summaries
+- `POST /api/elevenlabs-tts` - Generate ElevenLabs voice synthesis
 
-## 🎨 Customization
+### Admin (Protected)
 
-### Changing the AI Prompt
+- `GET /api/admin/users` - Get user list
+- `POST /api/admin/users` - Create/update users
+- `DELETE /api/admin/users/:id` - Delete users
 
-Edit the prompts in `app/api/explain/route.ts`:
+## Project Structure
 
-```typescript
-const teluguPrompt = (chunk: string) => `Your custom Telugu prompt here...`;
-const englishPrompt = (chunk: string) => `Your custom English prompt here...`;
+```
+src/
+├── app/
+│   ├── admin/
+│   │   └── dashboard/          # Admin dashboard
+│   ├── api/
+│   │   ├── auth/              # NextAuth routes
+│   │   ├── elevenlabs-tts/    # ElevenLabs API
+│   │   ├── summarize/         # OpenAI summarization
+│   │   └── upload/            # PDF upload processing
+│   ├── auth/
+│   │   └── signin/            # Sign in page
+│   ├── dashboard/             # User dashboard
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx               # Landing page
+├── components/
+│   ├── ElevenLabsVoiceSettings.tsx
+│   ├── LanguageToggle.tsx
+│   ├── PDFUpload.tsx
+│   └── VoiceSettings.tsx
+├── lib/
+│   └── auth.ts               # NextAuth configuration
+├── types/
+│   └── next-auth.d.ts        # TypeScript declarations
+└── middleware.ts             # Route protection
 ```
 
-### Styling
+## Customization
 
-The app uses Tailwind CSS. Modify styles in the component files or update `tailwind.config.js`.
+### Adding New Languages
 
-## 🚀 Deployment
+1. Update the `Language` type in components
+2. Add language options to `LanguageToggle` component
+3. Update API prompts for new language support
+
+### Adding New Voice Providers
+
+1. Create new voice settings component
+2. Add voice provider selection logic
+3. Implement voice synthesis API endpoint
+
+### Customizing Admin Features
+
+1. Extend the admin dashboard with new sections
+2. Add new API endpoints for admin functionality
+3. Update user management features as needed
+
+## Security Features
+
+- **Route Protection**: Middleware-based authentication
+- **Role-based Access**: Admin and user role separation
+- **Secure Authentication**: NextAuth.js with JWT tokens
+- **Input Validation**: Server-side validation for all inputs
+- **Environment Variables**: Secure configuration management
+
+## Deployment
 
 ### Vercel (Recommended)
 
-1. Push your code to GitHub
-2. Connect your repository to Vercel
-3. Add your `OPENAI_API_KEY` and `ELEVENLABS_API_KEY` to Vercel environment variables
-4. Deploy!
+1. **Connect Repository**: Link your GitHub repository to Vercel
+2. **Set Environment Variables**: Add all required environment variables
+3. **Deploy**: Vercel will automatically deploy on push to main branch
 
 ### Other Platforms
 
-The app can be deployed to any platform that supports Next.js:
+1. **Build the application**:
 
-- Netlify
-- Railway
-- DigitalOcean App Platform
-- AWS Amplify
+   ```bash
+   npm run build
+   ```
 
-## 🤝 Contributing
+2. **Start production server**:
+
+   ```bash
+   npm start
+   ```
+
+3. **Set environment variables** on your hosting platform
+
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -129,43 +232,24 @@ The app can be deployed to any platform that supports Next.js:
 4. Add tests if applicable
 5. Submit a pull request
 
-## 📝 License
+## License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🆘 Support
+## Support
 
-If you encounter any issues:
+For support and questions:
 
-1. Check the browser console for errors
-2. Verify your OpenAI API key is set correctly
-3. Ensure your PDF file is valid and readable
-4. Check the network tab for API request failures
+- Create an issue in the repository
+- Contact the development team
+- Check the documentation
 
-## 🔮 Future Enhancements
+## Roadmap
 
-- [ ] Support for more file formats (DOCX, TXT)
-- [ ] Voice explanations
-- [ ] Save and share study sessions
-- [ ] Multiple AI models support
-- [ ] Offline mode with cached explanations
-- [ ] Export explanations to PDF/Word
-
-## 🎤 Voice Features
-
-### Browser TTS
-
-- Uses built-in browser text-to-speech
-- Customizable speed, pitch, and volume
-- Automatic voice selection based on language
-- No additional API key required
-
-### ElevenLabs AI Voices
-
-- High-quality AI voices using Eleven v3 Alpha model
-- Enhanced naturalness and clarity
-- Speaker boost enabled for better pronunciation
-- Automatic voice selection:
-  - Varun R for Indian languages (Hindi, Telugu, Tamil, Kannada)
-  - Monika Sogam for English
-- Manual voice selection available
+- [ ] Database integration for user management
+- [ ] Advanced analytics and reporting
+- [ ] Mobile application
+- [ ] Offline support
+- [ ] Multi-language voice synthesis
+- [ ] Collaborative features
+- [ ] Integration with learning management systems
