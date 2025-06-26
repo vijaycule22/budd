@@ -23,6 +23,14 @@ interface Analytics {
     averageProcessingTime: number;
 }
 
+type TabId = 'overview' | 'users' | 'analytics' | 'settings';
+
+interface Tab {
+    id: TabId;
+    label: string;
+    icon: string;
+}
+
 export default function AdminDashboard() {
     const { data: session, status } = useSession();
     const router = useRouter();
@@ -35,7 +43,7 @@ export default function AdminDashboard() {
         averageProcessingTime: 0,
     });
     const [isLoading, setIsLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'analytics' | 'settings'>('overview');
+    const [activeTab, setActiveTab] = useState<TabId>('overview');
 
     // Check authentication and admin role
     useEffect(() => {
@@ -168,18 +176,18 @@ export default function AdminDashboard() {
             {/* Navigation Tabs */}
             <div className="container mx-auto px-6 py-4">
                 <div className="flex space-x-1 bg-white rounded-xl p-1 shadow-sm">
-                    {[
-                        { id: 'overview', label: 'Overview', icon: '📊' },
-                        { id: 'users', label: 'Users', icon: '👥' },
-                        { id: 'analytics', label: 'Analytics', icon: '📈' },
-                        { id: 'settings', label: 'Settings', icon: '⚙️' },
-                    ].map((tab) => (
+                    {([
+                        { id: 'overview' as TabId, label: 'Overview', icon: '📊' },
+                        { id: 'users' as TabId, label: 'Users', icon: '👥' },
+                        { id: 'analytics' as TabId, label: 'Analytics', icon: '📈' },
+                        { id: 'settings' as TabId, label: 'Settings', icon: '⚙️' },
+                    ] as Tab[]).map((tab) => (
                         <button
                             key={tab.id}
-                            onClick={() => setActiveTab(tab.id as any)}
+                            onClick={() => setActiveTab(tab.id)}
                             className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id
-                                    ? 'bg-blue-600 text-white shadow-md'
-                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                ? 'bg-blue-600 text-white shadow-md'
+                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                                 }`}
                         >
                             <span>{tab.icon}</span>
@@ -328,16 +336,16 @@ export default function AdminDashboard() {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${user.role === 'admin'
-                                                            ? 'bg-red-100 text-red-800'
-                                                            : 'bg-blue-100 text-blue-800'
+                                                        ? 'bg-red-100 text-red-800'
+                                                        : 'bg-blue-100 text-blue-800'
                                                         }`}>
                                                         {user.role}
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${user.status === 'active'
-                                                            ? 'bg-green-100 text-green-800'
-                                                            : 'bg-gray-100 text-gray-800'
+                                                        ? 'bg-green-100 text-green-800'
+                                                        : 'bg-gray-100 text-gray-800'
                                                         }`}>
                                                         {user.status}
                                                     </span>
