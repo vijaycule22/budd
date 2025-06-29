@@ -8,6 +8,8 @@ import PDFUpload from "@/components/PDFUpload";
 import LanguageToggle from "@/components/LanguageToggle";
 import VoiceSettings from "@/components/VoiceSettings";
 import ElevenLabsVoiceSettings from "@/components/ElevenLabsVoiceSettings";
+import StudyTools from "@/components/StudyTools";
+import Link from "next/link";
 
 export type Language = "telugu" | "hindi" | "tamil" | "kannada" | "english";
 
@@ -35,6 +37,10 @@ export default function Dashboard() {
     const [useElevenLabs, setUseElevenLabs] = useState(false);
     const [selectedElevenLabsVoice, setSelectedElevenLabsVoice] = useState<string>("");
     const [isGeneratingElevenLabs, setIsGeneratingElevenLabs] = useState(false);
+
+    // New state for flashcards and quiz
+    const [isGeneratingFlashcards, setIsGeneratingFlashcards] = useState(false);
+    const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false);
 
     const speechRef = useRef<SpeechSynthesisUtterance | null>(null);
     const [speechSynthesis, setSpeechSynthesis] = useState<SpeechSynthesis | null>(null);
@@ -116,6 +122,75 @@ export default function Dashboard() {
             console.error("Summary generation error:", error);
             alert("Failed to generate summary. Please try again.");
             setCurrentStep('upload');
+        }
+    };
+
+    const generateFlashcards = async (text: string) => {
+        setIsGeneratingFlashcards(true);
+        try {
+            const response = await fetch("/api/generate-flashcards", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    text: text,
+                    language,
+                    count: 10,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to generate flashcards");
+            }
+
+            const data = await response.json();
+            console.log("Flashcards response:", data);
+
+            // Save flashcards to localStorage
+            localStorage.setItem('studybuddy_flashcards', JSON.stringify(data.flashcards));
+
+            alert(`Successfully generated ${data.count} flashcards!`);
+        } catch (error) {
+            console.error("Flashcard generation error:", error);
+            alert("Failed to generate flashcards. Please try again.");
+        } finally {
+            setIsGeneratingFlashcards(false);
+        }
+    };
+
+    const generateQuiz = async (text: string) => {
+        setIsGeneratingQuiz(true);
+        try {
+            const response = await fetch("/api/generate-quiz", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    text: text,
+                    language,
+                    questionCount: 10,
+                    difficulty: 'medium',
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to generate quiz");
+            }
+
+            const data = await response.json();
+            console.log("Quiz response:", data);
+
+            // Save quiz questions to localStorage
+            localStorage.setItem('studybuddy_quiz_questions', JSON.stringify(data.questions));
+
+            alert(`Successfully generated ${data.count} quiz questions!`);
+        } catch (error) {
+            console.error("Quiz generation error:", error);
+            alert("Failed to generate quiz. Please try again.");
+        } finally {
+            setIsGeneratingQuiz(false);
         }
     };
 
@@ -328,6 +403,18 @@ export default function Dashboard() {
                                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                                 <span>User Dashboard</span>
                             </div>
+                            <Link
+                                href="/flashcards"
+                                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                            >
+                                📚 Flashcards
+                            </Link>
+                            <Link
+                                href="/quiz"
+                                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                            >
+                                🧠 Quiz
+                            </Link>
                             <button
                                 onClick={() => signOut({ callbackUrl: "/" })}
                                 className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
@@ -347,8 +434,8 @@ export default function Dashboard() {
                         <div className="flex items-center justify-center space-x-4">
                             <div className={`flex items-center space-x-2 ${currentStep === 'upload' ? 'text-blue-600' : currentStep === 'processing' ? 'text-blue-600' : 'text-green-600'}`}>
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${currentStep === 'upload' ? 'bg-blue-600 text-white' :
-                                        currentStep === 'processing' ? 'bg-blue-600 text-white' :
-                                            'bg-green-600 text-white'
+                                    currentStep === 'processing' ? 'bg-blue-600 text-white' :
+                                        'bg-green-600 text-white'
                                     }`}>
                                     1
                                 </div>
@@ -357,8 +444,8 @@ export default function Dashboard() {
                             <div className={`w-16 h-0.5 ${currentStep === 'processing' || currentStep === 'result' ? 'bg-blue-600' : 'bg-gray-300'}`}></div>
                             <div className={`flex items-center space-x-2 ${currentStep === 'processing' ? 'text-blue-600' : currentStep === 'result' ? 'text-green-600' : 'text-gray-400'}`}>
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${currentStep === 'processing' ? 'bg-blue-600 text-white' :
-                                        currentStep === 'result' ? 'bg-green-600 text-white' :
-                                            'bg-gray-300 text-gray-500'
+                                    currentStep === 'result' ? 'bg-green-600 text-white' :
+                                        'bg-gray-300 text-gray-500'
                                     }`}>
                                     2
                                 </div>
@@ -400,8 +487,8 @@ export default function Dashboard() {
                                         <button
                                             onClick={() => setUseElevenLabs(false)}
                                             className={`w-full p-4 rounded-xl border-2 transition-all ${!useElevenLabs
-                                                    ? "border-blue-500 bg-blue-50 text-blue-700"
-                                                    : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
+                                                ? "border-blue-500 bg-blue-50 text-blue-700"
+                                                : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
                                                 }`}
                                         >
                                             <div className="flex items-center space-x-3">
@@ -418,8 +505,8 @@ export default function Dashboard() {
                                         <button
                                             onClick={() => setUseElevenLabs(true)}
                                             className={`w-full p-4 rounded-xl border-2 transition-all ${useElevenLabs
-                                                    ? "border-purple-500 bg-purple-50 text-purple-700"
-                                                    : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
+                                                ? "border-purple-500 bg-purple-50 text-purple-700"
+                                                : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
                                                 }`}
                                         >
                                             <div className="flex items-center space-x-3">
@@ -637,6 +724,14 @@ export default function Dashboard() {
                                         📄 Upload Another Document
                                     </button>
                                 </div>
+
+                                {/* Study Tools Section */}
+                                <StudyTools
+                                    onGenerateFlashcards={() => generateFlashcards(plainTextSummary)}
+                                    onGenerateQuiz={() => generateQuiz(plainTextSummary)}
+                                    isGeneratingFlashcards={isGeneratingFlashcards}
+                                    isGeneratingQuiz={isGeneratingQuiz}
+                                />
                             </div>
                         </div>
                     )}
